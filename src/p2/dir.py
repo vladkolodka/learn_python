@@ -1,6 +1,8 @@
 ﻿from pathlib import Path
 from enum import Enum
 from mprint import print_colored, Color
+from typing import Optional
+
 
 class Directory(Enum):
     DESKTOP = "Desktop"
@@ -10,31 +12,35 @@ class Directory(Enum):
     MUSIC = "Music"
     VIDEOS = "Videos"
 
-def list_files_in_user_dir(directory: Directory, extension: str = None) -> list[Path]:
+
+def list_files_in_user_dir(directory: Directory, extensions: Optional[list[str]] = None) -> list[Path]:
     if directory is Directory.PICTURES:
         raise DirectoryNotFoundError(directory.value)
 
-    if extension and not extension.startswith("."):
-        extension = "." + extension
+    if extensions:
+        extensions = [ext if ext.startswith(
+            ".") else f".{ext}" for ext in extensions]
 
     directory_path = Path.home() / str(directory.value)
     files = [
         f for f in directory_path.iterdir()
-        if f.is_file() and (not extension or f.suffix == extension)
+        if f.is_file() and (not extensions or f.suffix in extensions)
     ]
 
     return files
 
+
 def print_dirs():
     for directory in Directory:
         try:
-            list_of_files = list_files_in_user_dir(directory, "ini")
+            list_of_files = list_files_in_user_dir(directory, ["ini"])
             print(f"Files in {directory.value}: {list_of_files}")
         except DirectoryNotFoundError as e:
             # print with error color
             print_colored(f"Error: {e}", Color.RED)
             print_colored(f"Warning: {e}", Color.YELLOW)
             continue
+
 
 class DirectoryNotFoundError(Exception):
     def __init__(self, directory: str):
@@ -43,6 +49,7 @@ class DirectoryNotFoundError(Exception):
         self.add_note(
             f"Please check if the directory '{directory}' exists in your home directory."
         )
+
 
 class FileNotFoundError(Exception):
     def __init__(self, file_path: str):

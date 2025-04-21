@@ -1,11 +1,11 @@
 import os
 import threading
 import time
-
 import monitoring
 from mprint import print_colored, Color
 from mdiagrams import create_line_chart_image, create_scatter_plot_image
 from enum import Enum
+from typing import Callable
 
 class ChartType(Enum):
     LINE = 'line'
@@ -17,7 +17,7 @@ def save_graph(results, chart_type=ChartType.LINE):
     :param results: List of CPU usage data points.
     :param chart_type: Type of chart to create (ChartType.LINE or ChartType.SCATTER).
     """
-    print('Saving graph...')
+    print('Saving graph... ✨📊✨')
     
     match chart_type:
         case ChartType.LINE:
@@ -25,9 +25,9 @@ def save_graph(results, chart_type=ChartType.LINE):
         case ChartType.SCATTER:
             chart_generator = create_scatter_plot_image
         case _:
-            raise ValueError(f"Unsupported chart type: {chart_type}")
+            raise ValueError(f"Unsupported chart type: {chart_type} ❌🚫")
 
-    chart = chart_generator(results, "CPU Usage Over Time", 'Time (s)', 'CPU Usage (%)')
+    chart = chart_generator(results, "CPU Usage Over Time 📈", 'Time (s) ⏱️', 'CPU Usage (%) 💻')
     
     path = get_next_file_path("images", "cpu_usage")
     
@@ -42,7 +42,7 @@ def wait_for_enter():
         input()
         event.set()
 
-    print_colored("Press Enter to stop monitoring...", Color.BLUE)
+    print_colored("Press Enter to stop monitoring... ⏹️🔵", Color.BLUE)
     threading.Thread(target=wait_user_input).start()
 
     return event
@@ -80,7 +80,20 @@ def combine_events(event1: threading.Event, event2: threading.Event) -> threadin
     threading.Thread(target=monitor_events, daemon=True).start()
     return combined_event
 
+def print_christmas_tree():
+    tree_height = 10
+    for i in range(tree_height):
+        spaces = ' ' * (tree_height - i - 1)
+        stars = '*' * (2 * i + 1)
+        print_colored(spaces + stars, Color.GREEN)
+    print_colored(' ' * (tree_height - 1) + '|', Color.RED)
+
 def main():
+    print_christmas_tree()
+
+    return
+    default_chart_type = ChartType.LINE
+
     root_event = wait_for_enter()
     
     while not root_event.is_set():
@@ -88,10 +101,10 @@ def main():
 
         results = monitoring.monitor_until_cancel(combined_event)
 
-        save_graph(results)
+        save_graph(results, default_chart_type)
         save_graph(results, ChartType.SCATTER)
     
-    print_colored("Monitoring stopped.", Color.RED)
+    print_colored("Monitoring stopped. 🛑🔴", Color.RED)
 
 def get_next_file_path(directory: str, file_name: str) -> str:
     """
@@ -106,5 +119,11 @@ def get_next_file_path(directory: str, file_name: str) -> str:
         counter += 1
     return f"{base_path}_{counter}.png"
 
+def sum(lambdaA: Callable[[], float], lambdaB: Callable[[], float]) -> float:
+    return lambdaA() + lambdaB()
+
 if __name__ == "__main__":
+    result = sum(lambda: 3.5, lambda: 2.5)
+    print(f"The result of the sum is: {result}")
+    
     main()

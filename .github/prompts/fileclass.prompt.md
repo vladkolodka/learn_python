@@ -1,0 +1,2 @@
+- prompt the user for a file name
+- create a new file with a python class that overrides all operators like '*', '+' etc

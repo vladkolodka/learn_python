@@ -26,26 +26,27 @@ def create_line_chart_image(measurements: list[float], caption: str, x_label: st
     return buffer.getvalue()
 
 def create_scatter_plot_image(measurements: list[float], caption: str, x_label: str, y_label: str, point_color: str = 'red'):
-    
+
     plt.figure(figsize=(10, 6), facecolor='black')
-    
+
     ax = plt.gca()
     ax.set_facecolor('black')
-    
-    plt.scatter(range(len(measurements)), measurements, color=point_color, s=50)
-    
+
+    plt.scatter(range(len(measurements)),
+                measurements, color=point_color, s=50)
+
     plt.title(caption, fontsize=16, fontweight='bold', color='white')
     plt.xlabel(x_label, fontsize=12, color='white')
     plt.ylabel(y_label, fontsize=12, color='white')
-    
+
     plt.grid(True, linestyle='--', color='gray', alpha=0.7)
     plt.tight_layout()
 
     add_current_datetime_to_chart()
-    
+
     buffer = BytesIO()
     plt.savefig(buffer, format='png')
     plt.close()
-    
+
     buffer.seek(0)
     return buffer.getvalue()
