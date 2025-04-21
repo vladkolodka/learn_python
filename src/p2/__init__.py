@@ -4,27 +4,30 @@ import time
 
 import monitoring
 from mprint import print_colored, Color
-from mdiagrams import create_line_chart_image
+from mdiagrams import create_line_chart_image, create_scatter_plot_image
+from enum import Enum
 
-# def monitor_cpu_usage(results, event, lock):
-#     """
-#     Monitor CPU usage and append data points to the results list.
-#     :param results: List to store CPU usage data points.
-#     :param event: Event to signal when to stop monitoring.
-#     :param lock: Lock to synchronize access to results.
-#     """
-#     for data_point in monitoring.monitor_until_cancel(event):
-#         with lock:  # Ensure thread-safe access to results
-#             results.append(data_point)
+class ChartType(Enum):
+    LINE = 'line'
+    SCATTER = 'scatter'
 
-def save_graph(results):
+def save_graph(results, chart_type=ChartType.LINE):
     """
     Save the CPU usage graph to a file.
     :param results: List of CPU usage data points.
+    :param chart_type: Type of chart to create (ChartType.LINE or ChartType.SCATTER).
     """
     print('Saving graph...')
     
-    chart = create_line_chart_image(results, "CPU Usage Over Time", 'Time (s)', 'CPU Usage (%)')
+    match chart_type:
+        case ChartType.LINE:
+            chart_generator = create_line_chart_image
+        case ChartType.SCATTER:
+            chart_generator = create_scatter_plot_image
+        case _:
+            raise ValueError(f"Unsupported chart type: {chart_type}")
+
+    chart = chart_generator(results, "CPU Usage Over Time", 'Time (s)', 'CPU Usage (%)')
     
     path = get_next_file_path("images", "cpu_usage")
     
@@ -81,11 +84,12 @@ def main():
     root_event = wait_for_enter()
     
     while not root_event.is_set():
-        combined_event = combine_events(root_event, expiration_event(2))
+        combined_event = combine_events(root_event, expiration_event(5))
 
         results = monitoring.monitor_until_cancel(combined_event)
 
         save_graph(results)
+        save_graph(results, ChartType.SCATTER)
     
     print_colored("Monitoring stopped.", Color.RED)
 

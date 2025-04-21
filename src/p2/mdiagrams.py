@@ -1,29 +1,51 @@
 ﻿import matplotlib.pyplot as plt
 from io import BytesIO
+from datetime import datetime
+
+def add_current_datetime_to_chart():
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    plt.figtext(0.99, 0.01, current_datetime, ha='right', fontsize=10, color='white', backgroundcolor='black')
 
 def create_line_chart_image(measurements: list[float], caption: str, x_label: str, y_label: str, line_color: str = 'blue', marker: str = 'o'):
-    """
-    Create a line chart image from the given measurements and caption.
-    :param measurements: List of measurements to plot.
-    :param caption: Caption for the chart.
-    :param x_label: Label for the x-axis.
-    :param y_label: Label for the y-axis.
-    :param line_color: Color of the line in the chart.
-    :param marker: Marker style for the data points.
-    :return: Binary data of the generated image.
-    """
+    plt.figure(figsize=(10, 6), facecolor='black')
+    ax = plt.gca()
+    ax.set_facecolor('black')
+    plt.plot(measurements, color='green', marker=marker, linewidth=2, markersize=8)
+    plt.title(caption, fontsize=16, fontweight='bold', color='white')
+    plt.xlabel(x_label, fontsize=12, color='white')
+    plt.ylabel(y_label, fontsize=12, color='white')
+    plt.grid(True, linestyle='--', color='gray', alpha=0.7)
+    plt.tight_layout()
 
-    # Create a line chart with enhancements
-    plt.plot(measurements, color=line_color, marker=marker)
-    plt.title(caption)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.grid(True)  # Add grid lines
+    add_current_datetime_to_chart()
 
-    # Save the chart as binary data
     buffer = BytesIO()
     plt.savefig(buffer, format='png')
     plt.close()
     buffer.seek(0)
+    return buffer.getvalue()
 
+def create_scatter_plot_image(measurements: list[float], caption: str, x_label: str, y_label: str, point_color: str = 'red'):
+    
+    plt.figure(figsize=(10, 6), facecolor='black')
+    
+    ax = plt.gca()
+    ax.set_facecolor('black')
+    
+    plt.scatter(range(len(measurements)), measurements, color=point_color, s=50)
+    
+    plt.title(caption, fontsize=16, fontweight='bold', color='white')
+    plt.xlabel(x_label, fontsize=12, color='white')
+    plt.ylabel(y_label, fontsize=12, color='white')
+    
+    plt.grid(True, linestyle='--', color='gray', alpha=0.7)
+    plt.tight_layout()
+
+    add_current_datetime_to_chart()
+    
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    plt.close()
+    
+    buffer.seek(0)
     return buffer.getvalue()

@@ -43,3 +43,11 @@ class DirectoryNotFoundError(Exception):
         self.add_note(
             f"Please check if the directory '{directory}' exists in your home directory."
         )
+
+class FileNotFoundError(Exception):
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+        super().__init__(f"File '{file_path}' not found.")
+        self.add_note(
+            f"Please check if the file '{file_path}' exists in your home directory."
+        )
