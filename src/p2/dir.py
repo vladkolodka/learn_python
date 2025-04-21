@@ -18,8 +18,7 @@ def list_files_in_user_dir(directory: Directory, extensions: Optional[list[str]]
         raise DirectoryNotFoundError(directory.value)
 
     if extensions:
-        extensions = [ext if ext.startswith(
-            ".") else f".{ext}" for ext in extensions]
+        extensions = [ext if ext.startswith(".") else f".{ext}" for ext in extensions]
 
     directory_path = Path.home() / str(directory.value)
     files = [
@@ -38,7 +37,6 @@ def print_dirs():
         except DirectoryNotFoundError as e:
             # print with error color
             print_colored(f"Error: {e}", Color.RED)
-            print_colored(f"Warning: {e}", Color.YELLOW)
             continue
 
 
